@@ -239,24 +239,36 @@
             font-weight: bold;
             color: #555;
         }
-        .form-group input, .form-group select {
+        /* New styles for form inputs in 'Peças' tab */
+        .form-control-input, .form-control-select {
             width: calc(100% - 22px);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
             box-sizing: border-box;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            background-color: #f9f9f9; /* Light grey background */
+            color: #333;
         }
-        .form-group input:focus, .form-group select:focus {
+        .form-control-input:focus, .form-control-select:focus {
+            border-color: #3498db; /* Highlight border on focus */
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); /* Subtle shadow on focus */
+            outline: none;
+            background-color: #ffffff;
+        }
+        /* Existing general form-group styles, ensuring they don't override specific new ones */
+        .form-group input:not(.form-control-input):focus, .form-group select:not(.form-control-select):focus {
             border-color: #3498db; /* Highlight border on focus */
             box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); /* Subtle shadow on focus */
             outline: none;
         }
-        .pecas-form.editing-form .form-group input,
-        .pecas-form.editing-form .form-group select {
+
+        .pecas-form.editing-form .form-control-input,
+        .pecas-form.editing-form .form-control-select {
             background-color: #fffacd;
         }
+
         .material-form.editing-form .form-group input,
         .material-form.editing-form .form-group select {
             background-color: #fffacd; /* A light yellow color for material edit */
@@ -427,38 +439,38 @@
                         <input type="hidden" id="editingRowIndex" value="-1">
                         <div class="form-group">
                             <label for="materialType">Tipo de material:</label>
-                            <select id="materialType" name="materialType">
+                            <select id="materialType" name="materialType" class="form-control-select">
                                 <option value="mdf">MDF</option>
-                                <option value="mdp">MDP</option>
+                                <option value="mdp">MDP</n>
                                 <option value="compensado">Compensado</option>
                             </select>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="length">Comprimento (mm):</label>
-                                <input type="number" id="length" name="length" placeholder="Ex: 1200" min="0">
+                                <input type="number" id="length" name="length" placeholder="Ex: 1200" min="0" class="form-control-input">
                             </div>
                             <div class="form-group">
                                 <label for="width">Largura (mm):</label>
-                                <input type="number" id="width" name="width" placeholder="Ex: 600" min="0">
+                                <input type="number" id="width" name="width" placeholder="Ex: 600" min="0" class="form-control-input">
                             </div>
                             <div class="form-group">
                                 <label for="quantity">Quantidade:</label>
-                                <input type="number" id="quantity" name="quantity" placeholder="Ex: 1" min="1">
+                                <input type="number" id="quantity" name="quantity" placeholder="Ex: 1" min="1" class="form-control-input">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="pecasItemName">Nome:</label>
-                                <input type="text" id="pecasItemName" name="pecasItemName" placeholder="Ex: Porta armário">
+                                <input type="text" id="pecasItemName" name="pecasItemName" placeholder="Ex: Porta armário" class="form-control-input">
                             </div>
                             <div class="form-group">
                                 <label for="tapeType">Tipo de fita:</label>
-                                <input type="text" id="tapeType" name="tapeType" placeholder="Ex: PVC">
+                                <input type="text" id="tapeType" name="tapeType" placeholder="Ex: PVC" class="form-control-input">
                             </div>
                             <div class="form-group">
                                 <label for="tapeLetter">Letra da Fita:</label>
-                                <input type="text" id="tapeLetter" name="tapeLetter" placeholder="Ex: A">
+                                <input type="text" id="tapeLetter" name="tapeLetter" placeholder="Ex: A" class="form-control-input">
                             </div>
                         </div>
                         <button type="submit" class="button" id="savePieceButton">Adicionar Peça</button>
@@ -517,24 +529,24 @@
                         <input type="hidden" id="editingGeneralItemIndex" value="-1">
                         <div class="form-group">
                             <label for="itemType">Tipo:</label>
-                            <select id="itemType" name="itemType" required>
+                            <select id="itemType" name="itemType" class="form-control-select" required>
                                 <option value="" selected disabled hidden>selecione o tipo</option>
-                                <option value="material">Material</option>
+                                <option value="material">Material</n>
                                 <option value="componente">Componente</option>
                             </select>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="itemName">Nome:</label>
-                                <input type="text" id="itemName" name="itemName" placeholder="Ex: MDF Branco" required>
+                                <input type="text" id="itemName" name="itemName" placeholder="Ex: MDF Branco" class="form-control-input" required>
                             </div>
                             <div class="form-group">
                                 <label for="itemUnit">Unidade:</label>
-                                <select id="itemUnit" name="itemUnit" required>
+                                <select id="itemUnit" name="itemUnit" class="form-control-select" required>
                                     <option value="" selected disabled hidden>selecione a unidade</option>
                                     <option value="unidade">unidade</option>
-                                    <option value="m">m</option>
-                                    <option value="m2">m²</option>
+                                    <option value="m">m</n>
+                                    <option value="m2">m²</n>
                                     <option value="par">par</option>
                                     <option value="kg">kg</option>
                                     <option value="L">L</option>
@@ -542,7 +554,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="itemValue">Valor:</label>
-                                <input type="number" id="itemValue" name="itemValue" placeholder="Ex: 150.50" min="0" step="0.01" required>
+                                <input type="number" id="itemValue" name="itemValue" placeholder="Ex: 150.50" min="0" step="0.01" class="form-control-input" required>
                             </div>
                         </div>
                         <button type="submit" class="button" id="saveGeneralItemButton">Adicionar Item</button>
@@ -591,7 +603,7 @@
                     <form id="calculatePricingForm">
                         <div class="form-group">
                             <label for="productCategory">Categoria do Produto:</label>
-                            <select id="productCategory" name="productCategory">
+                            <select id="productCategory" name="productCategory" class="form-control-select">
                                 <option value="movel">Móvel</option>
                                 <option value="painel">Painel</option>
                                 <option value="outro">Outro</option>
@@ -599,11 +611,11 @@
                         </div>
                         <div class="form-group">
                             <label for="profitMargin">Margem de Lucro (%):</label>
-                            <input type="number" id="profitMargin" name="profitMargin" placeholder="Ex: 30" min="0" step="0.01">
+                            <input type="number" id="profitMargin" name="profitMargin" placeholder="Ex: 30" min="0" step="0.01" class="form-control-input">
                         </div>
                         <div class="form-group">
                             <label for="extraHours">Horas Extras (R$):</label>
-                            <input type="number" id="extraHours" name="extraHours" placeholder="Ex: 0" min="0" step="0.01">
+                            <input type="number" id="extraHours" name="extraHours" placeholder="Ex: 0" min="0" step="0.01" class="form-control-input">
                         </div>
                         <button type="submit" class="button" id="calculateButton">Calcular Preço</button>
                     </form>
