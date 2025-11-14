@@ -205,6 +205,7 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
         }
 
+
         .footer {
             text-align: center;
             margin-top: auto;
@@ -391,6 +392,7 @@
                 <li><a href="#" id="showOverview"><i class="fas fa-home"></i> Página Inicial</a></li>
                 <li><a href="#" id="showPecas"><i class="fas fa-boxes"></i> Peças</a></li>
                 <li><a href="#" id="showCadastro"><i class="fas fa-tools"></i> Cadastro de Materiais e Componentes</a></li>
+                <li><a href="#" id="showPrecificacao"><i class="fas fa-calculator"></i> Precificação</a></li>
             </ul>
         </nav>
 
@@ -517,7 +519,7 @@
                             <label for="itemType">Tipo:</label>
                             <select id="itemType" name="itemType" required>
                                 <option value="" selected disabled hidden>selecione o tipo</option>
-                                <option value="material">Material</n>
+                                <option value="material">Material</option>
                                 <option value="componente">Componente</option>
                             </select>
                         </div>
@@ -582,6 +584,32 @@
                 </div>
             </div>
 
+            <!-- New section for Precificação -->
+            <div id="precificacaoContentSection" style="display: none;">
+                <h2>Cálculo de Precificação</h2>
+                <div id="pricingForm" class="form-section">
+                    <form id="calculatePricingForm">
+                        <div class="form-group">
+                            <label for="productCategory">Categoria do Produto:</label>
+                            <select id="productCategory" name="productCategory">
+                                <option value="movel">Móvel</option>
+                                <option value="painel">Painel</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="profitMargin">Margem de Lucro (%):</label>
+                            <input type="number" id="profitMargin" name="profitMargin" placeholder="Ex: 30" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="extraHours">Horas Extras (R$):</label>
+                            <input type="number" id="extraHours" name="extraHours" placeholder="Ex: 0" min="0" step="0.01">
+                        </div>
+                        <button type="submit" class="button" id="calculateButton">Calcular Preço</button>
+                    </form>
+                </div>
+            </div>
+
             <div class="footer">
                 &copy; 2023 Sua Empresa de Móveis. Todos os direitos reservados.
             </div>
@@ -593,9 +621,11 @@
         const showOverviewLink = document.getElementById('showOverview');
         const showPecasLink = document.getElementById('showPecas');
         const showCadastroLink = document.getElementById('showCadastro');
+        const showPrecificacaoLink = document.getElementById('showPrecificacao'); // New link
         const overviewSection = document.getElementById('overviewSection');
         const pecasContentSection = document.getElementById('pecasContentSection');
         const cadastroContentSection = document.getElementById('cadastroContentSection');
+        const precificacaoContentSection = document.getElementById('precificacaoContentSection'); // New section
         const pecasMaterialTypeDropdown = document.getElementById('materialType'); // Reference to the dropdown
         const pecasForm = document.getElementById('pecasForm');
         const summarySection = document.getElementById('summarySection');
@@ -606,7 +636,7 @@
         const piecesTableBody = document.getElementById('piecesTableBody');
         const materialSummaryDiv = document.getElementById('materialSummary');
         const tapeSummaryDiv = document.getElementById('tapeSummary');
-        const financialSummaryDiv = document.getElementById('financialSummary'); // New element
+        const financialSummaryDiv = document.getElementById('financialSummary');
 
         let globalTotalArea = 0;
         let globalTotalPerimeter = 0;
@@ -621,14 +651,11 @@
             compensado: 'Compensado'
         };
 
-        let tapeTotals = {}; // Initialize tapeTotals object
-        let totalMaterialCost = 0; // New cost variable
-        let totalComponentCost = 0; // New cost variable
-        let totalTapeCost = 0; // New cost variable
+        let tapeTotals = {};
 
         function updateSummaryDisplay() {
-            document.getElementById('totalArea').textContent = (globalTotalArea / 1000000).toFixed(2) + ' m²'; // Convert mm² to m²
-            document.getElementById('totalPerimeter').textContent = (globalTotalPerimeter / 1000).toFixed(2) + ' m'; // Convert mm to m
+            document.getElementById('totalArea').textContent = (globalTotalArea / 1000000).toFixed(2) + ' m²';
+            document.getElementById('totalPerimeter').textContent = (globalTotalPerimeter / 1000).toFixed(2) + ' m';
 
             materialSummaryDiv.innerHTML = '';
 
@@ -651,38 +678,14 @@
                 }
             }
 
-            // Update tape summary display
             tapeSummaryDiv.innerHTML = '<h3>Resumo de Fitas por Cor</h3>';
             for (const color in tapeTotals) {
                 if (tapeTotals[color] > 0) {
                     const p = document.createElement('p');
-                    p.innerHTML = `Fita ${color}: <span id="${color}TapeTotal">${(tapeTotals[color] / 1000).toFixed(2)} m</span>`; // Convert mm to m
+                    p.innerHTML = `Fita ${color}: <span id="${color}TapeTotal">${(tapeTotals[color] / 1000).toFixed(2)} m</span>`;
                     tapeSummaryDiv.appendChild(p);
                 }
             }
-
-            // Recalculate financial summary
-            totalMaterialCost = 0;
-            totalComponentCost = 0;
-            totalTapeCost = 0;
-
-            for (let i = 0; i < piecesTableBody.rows.length; i++) {
-                const pieceData = JSON.parse(piecesTableBody.rows[i].dataset.pieceData);
-                totalMaterialCost += pieceData.pieceMaterialCost || 0;
-                totalTapeCost += pieceData.pieceTapeCost || 0;
-            }
-
-            // Sum costs of all registered components. Assuming 'unidade' or other units mean direct cost.
-            // This part might need refinement based on how components are _used_ in a project.
-            registeredComponents.forEach(comp => {
-                totalComponentCost += comp.value; // For simplicity, sum up value of all registered components
-            });
-
-            // Update financial summary display
-            document.getElementById('totalMaterialCost').textContent = `R$ ${totalMaterialCost.toFixed(2)}`;
-            document.getElementById('totalComponentCost').textContent = `R$ ${totalComponentCost.toFixed(2)}`;
-            document.getElementById('totalTapeCost').textContent = `R$ ${totalTapeCost.toFixed(2)}`;
-            document.getElementById('totalProjectCost').textContent = `R$ ${(totalMaterialCost + totalComponentCost + totalTapeCost).toFixed(2)}`;
         }
 
         function clearForm() {
@@ -692,12 +695,12 @@
             document.getElementById('pecasItemName').value = '';
             document.getElementById('tapeType').value = '';
             document.getElementById('tapeLetter').value = '';
-            pecasMaterialTypeDropdown.value = 'mdf'; // Reset to default
+            pecasMaterialTypeDropdown.value = 'mdf';
             editingRowIndexInput.value = -1;
             savePieceButton.textContent = 'Adicionar Peça';
             savePieceButton.style.backgroundColor = '#3498db';
             pecasForm.classList.remove('editing-form');
-            clearGeneralItemForm(); // Call new function to clear general item form
+            clearGeneralItemForm();
         }
 
         function updateMaterialTypeDropdown() {
@@ -725,7 +728,7 @@
             if ([...pecasMaterialTypeDropdown.options].some(option => option.value === currentSelection)) {
                 pecasMaterialTypeDropdown.value = currentSelection;
             } else {
-                pecasMaterialTypeDropdown.value = 'mdf'; // Fallback to default
+                pecasMaterialTypeDropdown.value = 'mdf';
             }
         }
 
@@ -733,6 +736,7 @@
             overviewSection.style.display = 'none';
             pecasContentSection.style.display = 'none';
             cadastroContentSection.style.display = 'none';
+            precificacaoContentSection.style.display = 'none'; // Hide new section
 
             document.querySelectorAll('#sidebar ul li a').forEach(link => {
                 link.classList.remove('active');
@@ -750,10 +754,9 @@
                 renderMaterialsTable();
                 renderComponentsTable();
             }
-            updateSummaryDisplay(); // Always update summary when section changes
+            updateSummaryDisplay();
         }
 
-        // Event listener for the 'Iniciar Orçamento' button within the overview
         if (startButton) {
             startButton.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -762,7 +765,6 @@
             });
         }
 
-        // Event listeners for sidebar navigation
         if (showOverviewLink) {
             showOverviewLink.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -782,6 +784,14 @@
             showCadastroLink.addEventListener('click', function(event) {
                 event.preventDefault();
                 showSection(cadastroContentSection, showCadastroLink);
+            });
+        }
+
+        if (showPrecificacaoLink) { // New event listener for Precificação link
+            showPrecificacaoLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                showSection(precificacaoContentSection, showPrecificacaoLink);
+                updateSummaryDisplay();
             });
         }
 
@@ -809,7 +819,7 @@
                 let tapeLength = 0;
                 if (tapeLetter) {
                     switch (tapeLetter.toUpperCase()) {
-                        case 'O': tapeLength = (2* (length + width)); break;
+                        case 'O': tapeLength = (2 * (length + width)); break;
                         case 'I': tapeLength = length; break;
                         case 'U': tapeLength = (2 * length + width); break;
                         case 'C': tapeLength = (2 * width + length); break;
@@ -820,25 +830,8 @@
                     tapeLength *= quantity;
                 }
 
-                // Get material and tape unit costs from registered items
-                let materialUnitCost = 0;
-                let tapeUnitCost = 0;
-
-                const foundMaterial = registeredMaterials.find(mat => mat.name === materialType && mat.type === 'material');
-                if (foundMaterial) {
-                    materialUnitCost = foundMaterial.unit === 'm2' ? foundMaterial.value : 0; // Assuming cost is per m²
-                } else if (materialType === 'mdf' || materialType === 'mdp' || materialType === 'compensado') {
-                    // For default materials, we don't have a specific cost, so it remains 0 unless added in cadastro.
-                    // This can be extended to have default costs later.
-                }
-
-                const foundTape = registeredComponents.find(comp => comp.name === tapeType && comp.type === 'componente' && comp.unit === 'm');
-                if (foundTape) {
-                    tapeUnitCost = foundTape.value; // Assuming cost is per m
-                }
-
-                const pieceMaterialCost = (pieceArea / 1000000) * materialUnitCost; // Convert mm² to m²
-                const pieceTapeCost = (tapeLength / 1000) * tapeUnitCost; // Convert mm to m
+                const pieceMaterialCost = 0; // Will be calculated in next step
+                const pieceTapeCost = 0; // Will be calculated in next step
 
                 const pieceData = {
                     materialType: materialType,
@@ -922,6 +915,7 @@
 
                         globalTotalArea -= rowPieceData.area;
                         globalTotalPerimeter -= rowPieceData.perimeter;
+
                         if (materialTotals[rowPieceData.materialType]) {
                             materialTotals[rowPieceData.materialType].area -= rowPieceData.area;
                             materialTotals[rowPieceData.materialType].perimeter -= rowPieceData.perimeter;
@@ -975,13 +969,13 @@
         const materialsTableBody = document.getElementById('materialsTableBody');
         const componentsTableBody = document.getElementById('componentsTableBody');
 
-        let registeredMaterials = [];
-        let registeredComponents = [];
+        let registeredMaterials = []; // Array to store material objects
+        let registeredComponents = []; // Array to store component objects
 
         function clearGeneralItemForm() {
-            itemTypeInput.value = '';
+            itemTypeInput.value = ''; // Reset to placeholder
             itemNameInput.value = '';
-            itemUnitInput.value = '';
+            itemUnitInput.value = ''; // Reset to placeholder
             itemValueInput.value = '';
             editingGeneralItemIndexInput.value = -1;
             saveGeneralItemButton.textContent = 'Adicionar Item';
@@ -1024,7 +1018,7 @@
                     updateMaterialTypeDropdown();
                     clearGeneralItemForm();
                     saveDataToLocalStorage();
-                    updateSummaryDisplay(); // Update costs after removing material
+                    updateSummaryDisplay();
                 });
                 actionsCell.appendChild(removeButton);
             });
@@ -1064,7 +1058,7 @@
                     renderComponentsTable();
                     clearGeneralItemForm();
                     saveDataToLocalStorage();
-                    updateSummaryDisplay(); // Update costs after removing component
+                    updateSummaryDisplay();
                 });
                 actionsCell.appendChild(removeButton);
             });
@@ -1102,7 +1096,8 @@
                 } else if (itemType === 'componente') {
                     if (editingIndex !== -1) {
                         registeredComponents[editingIndex] = newItemData;
-                    } else {
+                    }
+                    else {
                         registeredComponents.push(newItemData);
                     }
                     renderComponentsTable();
@@ -1111,7 +1106,7 @@
                 updateMaterialTypeDropdown();
                 clearGeneralItemForm();
                 saveDataToLocalStorage();
-                updateSummaryDisplay(); // Update costs after add/edit general item
+                updateSummaryDisplay();
             });
         }
 
@@ -1227,12 +1222,11 @@
             renderMaterialsTable();
             renderComponentsTable();
             updateMaterialTypeDropdown();
-            updateSummaryDisplay(); // Call updateSummaryDisplay to show initial summary including financial
+            updateSummaryDisplay();
         }
 
-        // Event listener to automatically set tapeType based on materialType
         pecasMaterialTypeDropdown.addEventListener('change', function() {
-            const selectedMaterial = this.value; // e.g., 'mdf' or 'MDF Branco'
+            const selectedMaterial = this.value;
             let tapeType = '';
 
             const patterns = [
@@ -1265,9 +1259,7 @@
             document.getElementById('tapeType').value = tapeType;
         });
 
-        // Initial display state: show overview section by default
         showSection(overviewSection, showOverviewLink);
-        // Load data on initial page load
         loadDataFromLocalStorage();
     </script>
 </body>
